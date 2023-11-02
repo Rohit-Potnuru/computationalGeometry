@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ConvexHullView />}>
+        <Route path="/computationalGeometry" element={<ConvexHullView />}>
           <Route index element={<ConvexHullView/>} />
           <Route path="sweepline" element={<Circle/>} />
           <Route path="artgalleryproblem" element={<ConvexHullComponent/>} />
