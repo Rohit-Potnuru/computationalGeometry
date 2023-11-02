@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/computationalGeometry/static/css/main.964fdded.css",
+    "main.js": "/computationalGeometry/static/js/main.1632aa12.js",
+    "index.html": "/computationalGeometry/index.html",
+    "main.964fdded.css.map": "/computationalGeometry/static/css/main.964fdded.css.map",
+    "main.1632aa12.js.map": "/computationalGeometry/static/js/main.1632aa12.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.964fdded.css",
+    "static/js/main.1632aa12.js"
+  ]
+}
