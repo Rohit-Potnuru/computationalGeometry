@@ -1,0 +1,14 @@
+.ConvexHullView {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 15px;
+}
+
+.convexHullInputs {
+    display: flex;
+    margin-top: 10px;
+    justify-content: center;
+    align-items: center;
+}

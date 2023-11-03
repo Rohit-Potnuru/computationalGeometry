@@ -1,18 +1,16 @@
-function GrahamScanAlgorithm(points) {
-    if (points.length < 3) return null;
+import { DrawPoints2D } from "../../shapes/point2D";
+import DrawHull from "../draw/DrawHull";
+import { clearCanvas } from "../draw/canvas";
 
+async function GrahamScanAlgorithm(ctx, canvas, points, speed = 1) {
+    if (points.length < 3) return null;
+    let n = points.length;
+    speed = 1000;
     // Sort points lexicographically
     points.sort((a, b) => a[0] === b[0] ? a[1] - b[1] : a[0] - b[0]);
 
     // Find the pivot point, which is the point with the lowest y-coordinate
     const pivot = points[0];
-
-    // // Sort the points based on polar angle with pivot
-    // points.sort((a, b) => {
-    //     const angleA = Math.atan2(a[1] - pivot[1], a[0] - pivot[0]);
-    //     const angleB = Math.atan2(b[1] - pivot[1], b[0] - pivot[0]);
-    //     return angleA - angleB;
-    // });
 
     // Build the convex hull
     const uhull = [pivot, points[1]];
@@ -21,6 +19,11 @@ function GrahamScanAlgorithm(points) {
             uhull.pop();
         }
         uhull.push(points[i]);
+
+        await new Promise(resolve => setTimeout(resolve, speed/n));
+        clearCanvas(ctx, canvas);
+        DrawPoints2D(ctx, points);
+        DrawHull(ctx, uhull, 'yellow');
     }
 
     const lhull = [pivot, points[1]];
@@ -29,6 +32,12 @@ function GrahamScanAlgorithm(points) {
             lhull.pop();
         }
         lhull.push(points[i]);
+
+        await new Promise(resolve => setTimeout(resolve, speed/n));
+        clearCanvas(ctx, canvas);
+        DrawPoints2D(ctx, points);
+        DrawHull(ctx, uhull, 'red');
+        DrawHull(ctx, lhull, 'yellow');
     }
 
     return [...uhull, ...lhull.reverse()];
