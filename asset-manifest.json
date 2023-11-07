@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/computationalGeometry/static/css/main.b8b3456c.css",
-    "main.js": "/computationalGeometry/static/js/main.9e796319.js",
+    "main.css": "/computationalGeometry/static/css/main.3ccec9e7.css",
+    "main.js": "/computationalGeometry/static/js/main.67cf5d9c.js",
     "index.html": "/computationalGeometry/index.html",
-    "main.b8b3456c.css.map": "/computationalGeometry/static/css/main.b8b3456c.css.map",
-    "main.9e796319.js.map": "/computationalGeometry/static/js/main.9e796319.js.map"
+    "main.3ccec9e7.css.map": "/computationalGeometry/static/css/main.3ccec9e7.css.map",
+    "main.67cf5d9c.js.map": "/computationalGeometry/static/js/main.67cf5d9c.js.map"
   },
   "entrypoints": [
-    "static/css/main.b8b3456c.css",
-    "static/js/main.9e796319.js"
+    "static/css/main.3ccec9e7.css",
+    "static/js/main.67cf5d9c.js"
   ]
 }
