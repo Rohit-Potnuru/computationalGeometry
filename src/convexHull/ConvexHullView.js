@@ -19,6 +19,7 @@ function ConvexHullView() {
     const [selectedAlgorithm, setSelectedAlgorithm] = useState("Chan's Algorithm");
     const [isProcessing, setIsProcessing] = useState(false);
     const [mValue, setMValue] = useState(3);
+    const [mValueVisible, setMValueVisible] = useState(true);
 
     let max = 100;
     let min = 0;
@@ -43,6 +44,7 @@ function ConvexHullView() {
 
         clearCanvas(ctx, canvas);
         DrawPoints2D(ctx, points);
+
     }, [numPoints, selectedAlgorithm]);
 
     const handleButtonClick = async () => {
@@ -72,7 +74,7 @@ function ConvexHullView() {
     return (
         <div className="ConvexHullView">
             <div className='convexHullInputs'>
-                <Stack spacing={2} direction="rows">
+                <Stack spacing={2} direction="row">
                     <InputSlider name = "Steps"
                                 inputSliderValue = {[stepSlider, setStepSliders]}
                                 range = {[min, max]}
@@ -89,15 +91,13 @@ function ConvexHullView() {
                                 sValue = {[selectedAlgorithm, setSelectedAlgorithm]}
                                 sMenu = {Object.keys(ConvexHullAlgorithms)}
                 />
-                {selectedAlgorithm === "Chan's Algorithm" ? 
+                {(selectedAlgorithm === "Chan's Algorithm") && 
                     <InputSlider name = "m Value"
                         inputSliderValue = {[mValue, setMValue]}
                         range = {[2, 2500]}
                         sideNameFlag = {true}
                         disabled = {isProcessing}
                     />
-                    :
-                    <></>
                 }
                 
                 <button 

@@ -34,10 +34,7 @@ export default function MultipleSelect({name, sValue, sMenu}) {
     const {
       target: { value },
     } = event;
-    setSelectValue(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
+    setSelectValue(value);
   };
 
   return (

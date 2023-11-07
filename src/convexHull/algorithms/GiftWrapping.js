@@ -30,7 +30,16 @@ async function GiftWrappingAlgorithm(ctx, canvas, points, options) {
 
         for(let j = 0; j < pN; j++) {
             await DrawFrame(ctx, canvas, points, hull, colors, speed);
-            DrawHull(ctx, [pointOnHull, points[j]], {...options, strokeStyle : colors[0]});
+            DrawHull(ctx, [pointOnHull, endPoint], 
+                        {...options, 
+                         strokeStyle : colors[0],
+                         dotted: true
+                        });
+            DrawHull(ctx, [endPoint, points[j]], 
+                        {...options, 
+                            strokeStyle : 'green',
+                            dotted: true
+                        });
 
             if((endPoint === pointOnHull) || cross(pointOnHull, endPoint, points[j]) > 0) {
                 endPoint = points[j];
