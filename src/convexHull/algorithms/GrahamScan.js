@@ -1,51 +1,57 @@
 import { DrawPoints2D } from "../../shapes/point2D";
+import { cross } from "../../utils/Orientation";
 import DrawHull from "../draw/DrawHull";
 import { clearCanvas } from "../draw/canvas";
 
-async function GrahamScanAlgorithm(ctx, canvas, points, speed = 1) {
-    if (points.length < 3) return null;
-    let n = points.length;
-    speed = 1000;
+async function GrahamScanAlgorithm(ctx, canvas, points, options) {
+
+    let {
+        colors = ['yellow', 'red'],
+        speed = -1
+    } = options;
+
+    if (points.length < 3) return points;
+    let pN = points.length;
+    if(speed === -1)
+     speed = pN < 200? pN < 50? 400:20 : 0;
     // Sort points lexicographically
     points.sort((a, b) => a[0] === b[0] ? a[1] - b[1] : a[0] - b[0]);
 
     // Find the pivot point, which is the point with the lowest y-coordinate
     const pivot = points[0];
 
-    // Build the convex hull
-    const uhull = [pivot, points[1]];
-    for (let i = 2; i < points.length; i++) {
-        while (uhull.length >= 2 && cross(uhull[uhull.length - 2], uhull[uhull.length - 1], points[i]) <= 0) {
-            uhull.pop();
-        }
-        uhull.push(points[i]);
+    points.sort((a, b) => cross(a, pivot, b));
 
-        await new Promise(resolve => setTimeout(resolve, speed/n));
+    let hull = [pivot], temp;
+    for(let i = 1; i < pN; i++) {
+        temp = [];
+        while (hull.length >= 2 && 
+            cross(hull[hull.length - 2], hull[hull.length - 1], points[i]) <= 0) {
+            temp.push(hull.pop());
+        }
+
+        await new Promise(resolve => setTimeout(resolve, speed));
         clearCanvas(ctx, canvas);
         DrawPoints2D(ctx, points);
-        DrawHull(ctx, uhull, 'yellow');
+        DrawHull(ctx, hull, 
+                    { strokeStyle : colors[1],
+                      lineWidth : 4,
+                    });
+        DrawHull(ctx, [hull[hull.length - 1], points[i]], 
+                    {   strokeStyle : colors[0], 
+                        dotted: true
+                    });
+        console.log(temp);
+        if(hull.length >= 1)
+        DrawHull(ctx, [...temp, hull[hull.length - 1]], 
+            {   strokeStyle : 'green', 
+                dotted: true
+            });
+
+        hull.push(points[i]);
     }
-
-    const lhull = [pivot, points[1]];
-    for (let i = 2; i < points.length; i++) {
-        while (lhull.length >= 2 && cross(lhull[lhull.length - 2], lhull[lhull.length - 1], points[i]) >= 0) {
-            lhull.pop();
-        }
-        lhull.push(points[i]);
-
-        await new Promise(resolve => setTimeout(resolve, speed/n));
-        clearCanvas(ctx, canvas);
-        DrawPoints2D(ctx, points);
-        DrawHull(ctx, uhull, 'red');
-        DrawHull(ctx, lhull, 'yellow');
-    }
-
-    return [...uhull, ...lhull.reverse()];
-}
-
-// Helper function to calculate the cross product of three points
-function cross(o, a, b) {
-    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    hull.push(pivot);
+    return hull;
 }
 
 export default GrahamScanAlgorithm;

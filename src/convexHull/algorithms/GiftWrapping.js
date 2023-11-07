@@ -1,55 +1,68 @@
 import { DrawPoints2D } from "../../shapes/point2D";
 import DrawHull from "../draw/DrawHull";
+import { cross } from "../../utils/Orientation";
 import { clearCanvas } from "../draw/canvas";
 
-async function GiftWrapping(ctx, canvas, points, speed = 1) {
-    if (points.length < 3) return null;
-    let n = points.length;
-    speed = 1000;
+const X = 0;
+const Y = 1;
+
+async function GiftWrappingAlgorithm(ctx, canvas, points, options) {
+
+    let {
+        colors = ['yellow', 'red'],
+        speed = -1
+    } = options;
+
+    if (points.length < 3) return points;
+    let pN = points.length;
+    if(speed === -1)
+        speed = pN < 200? pN < 50? 40:5 : 0;
 
     // Find the pivot point, which is the point with the lowest y-coordinate
-    let pivot = points[0];
-    for(let i = 1; i < points.length; i++) {
-        if(pivot[0] == points[i][0] && pivot[1] < points[i][1])
-            pivot = points[i];
-        else if(pivot[0] > points[i][0])
-            pivot = points[i];
-    }
+    let pointOnHull = getLeftmostPoint(points);
 
     // Build the convex hull
-    const hull = [pivot];
-    let curr = -1;
-    while(curr != pivot && hull.length < points.length) {
-        curr = hull[hull.length - 1];
-        for(let i = 0; i < points.length; i++) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            clearCanvas(ctx, canvas);
-            DrawPoints2D(ctx, points);
-            DrawHull(ctx, hull, 'red');
-            DrawHull(ctx, [curr, points[i]], 'yellow');
-            if(validateOrientations(points, curr, points[i])) {
-                // curr = points[i];
-                hull.push(points[i]);
-                break;
+    let hull = [];
+    let endPoint = points[0];
+    do{
+        hull.push(pointOnHull);
+        endPoint = points[0];
+
+        for(let j = 0; j < pN; j++) {
+            await DrawFrame(ctx, canvas, points, hull, colors, speed);
+            DrawHull(ctx, [pointOnHull, points[j]], {...options, strokeStyle : colors[0]});
+
+            if((endPoint === pointOnHull) || cross(pointOnHull, endPoint, points[j]) > 0) {
+                endPoint = points[j];
             }
         }
-        curr = hull[hull.length - 1];
-    }
+        pointOnHull = endPoint;
+
+        await DrawFrame(ctx, canvas, points, hull, options);
+    } while(endPoint !== hull[0]) 
+    hull.push(hull[0]);
     return hull;
 }
 
-//check for left point
-function validateOrientations(points, a, o) {
-    for(let j = 0; j < points.length; j++) {
-        if(cross(o, a, points[j]) < 0)
-            return false;
+async function DrawFrame(ctx, canvas, points, hull, options) {
+    let {
+        colors = ['yellow', 'red'],
+        speed = -1
+    } = options;
+
+    await new Promise(resolve => setTimeout(resolve, speed));
+    clearCanvas(ctx, canvas);
+    DrawPoints2D(ctx, points);
+    DrawHull(ctx, hull, { strokeStyle : colors[1]});
+}
+
+function getLeftmostPoint(points) {
+    let pivot = points[0];
+    for(let i = 1; i < points.length; i++) {
+        if(pivot[X] > points[i][X] || pivot[X] == points[i][X] && pivot[Y] < points[i][Y])
+            pivot = points[i];
     }
-    return true;
-}
+    return pivot
+}  
 
-// Helper function to calculate the cross product of three points
-function cross(o, a, b) {
-    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-}
-
-export default GiftWrapping;
+export default GiftWrappingAlgorithm;

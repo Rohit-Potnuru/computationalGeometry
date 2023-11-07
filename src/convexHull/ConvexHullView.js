@@ -1,19 +1,27 @@
-import React, { useRef, useEffect, useState} from 'react';
-import Point2D, { DrawPoints2D } from '../shapes/point2D';
-import { generatePoints } from '../utils/points';
-import GrahamScanAlgorithm from './algorithms/GrahamScan';
-import DrawHull from './draw/DrawHull';
 import './ConvexHullView.css';
-import GiftWrapping from './algorithms/GiftWrapping';
+import React, { useRef, useEffect, useState} from 'react';
+import { generatePoints } from '../utils/points';
+import { DrawPoints2D } from '../shapes/point2D';
 import { clearCanvas } from './draw/canvas';
+import DrawHull from './draw/DrawHull';
+import InputSlider from '../utils/components/InputSlider';
+import MultipleSelect from '../utils/components/InputSelect';
+import ConvexHullAlgorithms from './algorithms/ConvexHullAlgorithms';
+import { Stack } from '@mui/system';
 
 
 function ConvexHullView() {
     const canvasRef = useRef(null);
-    const [numPoints, setNumPoints] = useState(10);
+    const [stepSlider, setStepSliders] = useState(0);
+    const [numPoints, setNumPoints] = useState(100);
+    const [minNumPoints, maxNumPoints] = [3, 2500];
     const [points, setPoints] = useState([]);
-    const [selectedAlgorithm, setSelectedAlgorithm] = useState('GrahamScan');
+    const [selectedAlgorithm, setSelectedAlgorithm] = useState("Chan's Algorithm");
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [mValue, setMValue] = useState(3);
 
+    let max = 100;
+    let min = 0;
     useEffect(() => {
         const sizes = {
             width: 700,
@@ -26,10 +34,6 @@ function ConvexHullView() {
         // Set the size of the canvas
         canvas.width = sizes.width;
         canvas.height = sizes.height;
-        clearCanvas(ctx, canvas);
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 
         const outerBoundary = 30;
         const dimensionBoundaries = [[0 + outerBoundary, sizes.width - outerBoundary], 
@@ -37,64 +41,75 @@ function ConvexHullView() {
         const points = generatePoints(numPoints, dimensionBoundaries);
         setPoints(points);
 
+        clearCanvas(ctx, canvas);
         DrawPoints2D(ctx, points);
-
     }, [numPoints, selectedAlgorithm]);
 
-    const handleInputChange = (event) => {
-        const value = parseInt(event.target.value, 10);
-        if (!isNaN(value) && value >= 0) {
-            setNumPoints(value);
-        }
-    }
-
-    const handleSelectChange = (event) => {
-        setSelectedAlgorithm(event.target.value);
-    };
-
     const handleButtonClick = async () => {
+        setIsProcessing(true);
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
         let convexHullPoints = [];
-        if(selectedAlgorithm == "GrahamScan") {
-            convexHullPoints = await GrahamScanAlgorithm(ctx, canvas, points);
+        try {
+            let options = {};
+            if(selectedAlgorithm === "Chan's Algorithm")
+                options = {mValue: mValue};
+            if(selectedAlgorithm in ConvexHullAlgorithms)
+                convexHullPoints = await ConvexHullAlgorithms[selectedAlgorithm](ctx, canvas, points, options);
+            
+            DrawPoints2D(ctx, points);
+            DrawHull(ctx, convexHullPoints, {lineWidth : 4});
+            console.log("Algorithm Finished");
+            console.log(convexHullPoints);
         }
-        else if(selectedAlgorithm == "GiftWrapping") {
-            convexHullPoints = await GiftWrapping(ctx, canvas, points);
+        catch (error) {
+            console.error("An error occurred while generating the convex hull:", error);
         }
-        
-        DrawHull(ctx, convexHullPoints);
-        console.log(convexHullPoints);
+        setIsProcessing(false);
     }
-
 
     return (
         <div className="ConvexHullView">
-            <div className="convexHullWebGl">
-            <canvas ref={canvasRef} ></canvas>
-            </div>
             <div className='convexHullInputs'>
-                <label>
-                    Number of Points:
-                    <input
-                        type="number"
-                        value={numPoints}
-                        onChange={handleInputChange}
-                        min="0"
+                <Stack spacing={2} direction="rows">
+                    <InputSlider name = "Steps"
+                                inputSliderValue = {[stepSlider, setStepSliders]}
+                                range = {[min, max]}
+                                // sideNameFlag = {true}
+                                disabled = {isProcessing}
                     />
-                </label>
-                <select
-                    id="convexHullAlgorithms"
-                    name="convexHullAlgorithms"
-                    value={selectedAlgorithm}
-                    onChange={handleSelectChange}
+                    <InputSlider name = "Number of Points"
+                                inputSliderValue = {[numPoints, setNumPoints]}
+                                range = {[minNumPoints, maxNumPoints]}
+                                disabled = {isProcessing}
+                    />
+                </Stack>
+                <MultipleSelect name = "Convex Hull Algorithm"
+                                sValue = {[selectedAlgorithm, setSelectedAlgorithm]}
+                                sMenu = {Object.keys(ConvexHullAlgorithms)}
+                />
+                {selectedAlgorithm === "Chan's Algorithm" ? 
+                    <InputSlider name = "m Value"
+                        inputSliderValue = {[mValue, setMValue]}
+                        range = {[2, 2500]}
+                        sideNameFlag = {true}
+                        disabled = {isProcessing}
+                    />
+                    :
+                    <></>
+                }
+                
+                <button 
+                    onClick={handleButtonClick}
+                    disabled={isProcessing}
                 >
-                    <option value="GrahamScan">Graham Scan</option>
-                    <option value="GiftWrapping">Jarvis March Gift Wrapping</option>
-                    <option value="Chan's">Chan Algorithm</option>
-                </select>
-                <button onClick={handleButtonClick}>Generate Convex Hull</button>
+                    {isProcessing ? "Processing..." : "Animate Convex Hull"}
+                </button>
+            </div>
+            
+            <div className="convexHullWebGl">
+                <canvas ref={canvasRef} ></canvas>
             </div>
         </div>
     );
