@@ -1,8 +1,8 @@
 import './ConvexHullView.css';
 import React, { useRef, useEffect, useState} from 'react';
 import { generatePoints } from '../utils/points';
-import { DrawPoints2D } from '../shapes/point2D';
-import { clearCanvas } from './draw/canvas';
+import { DrawPoints2D } from './draw/DrawPoints2D';
+import { clearCanvas } from './draw/Canvas';
 import DrawHull from './draw/DrawHull';
 import InputSlider from '../utils/components/InputSlider';
 import MultipleSelect from '../utils/components/InputSelect';
@@ -13,16 +13,15 @@ import { Stack } from '@mui/system';
 function ConvexHullView() {
     const canvasRef = useRef(null);
     const [stepSlider, setStepSliders] = useState(0);
+    const [stepSliderRange, setStepSliderRange] = useState([0, 100]);
     const [numPoints, setNumPoints] = useState(100);
     const [minNumPoints, maxNumPoints] = [3, 2500];
     const [points, setPoints] = useState([]);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState("Chan's Algorithm");
+    const [algorithmSteps, setAlgorithmSteps] = useState([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [mValue, setMValue] = useState(3);
-    const [mValueVisible, setMValueVisible] = useState(true);
 
-    let max = 100;
-    let min = 0;
     useEffect(() => {
         const sizes = {
             width: 700,
@@ -44,8 +43,35 @@ function ConvexHullView() {
 
         clearCanvas(ctx, canvas);
         DrawPoints2D(ctx, points);
+        if(selectedAlgorithm === "Chan's Algorithm") {
+            setStepSliders(0);
+            setAlgorithmSteps([]);
+            setStepSliderRange([0, 100]);
+        }
+        else {
+            let {hull, hullSteps} = ConvexHullAlgorithms[selectedAlgorithm](points, {recordSteps: true});
+            setStepSliders(0);
+            setAlgorithmSteps(hullSteps);
+            setStepSliderRange([0, hullSteps.length - 1]);
+        }
+    }, [numPoints, selectedAlgorithm, mValue]);
 
-    }, [numPoints, selectedAlgorithm]);
+    function AnimationAlgorithm(ctx, canvas, step) {
+        if(algorithmSteps.length > step) {
+            const algorithmStep = algorithmSteps[step];
+            clearCanvas(ctx, canvas);
+            DrawPoints2D(ctx, points);
+            for(let i = 0; i < algorithmStep.length; i++) {
+                algorithmStep[i].render(ctx, canvas);
+            }
+        }
+    }
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        AnimationAlgorithm(ctx, canvas, stepSlider);
+    }, [stepSlider]);
 
     const handleButtonClick = async () => {
         setIsProcessing(true);
@@ -55,13 +81,21 @@ function ConvexHullView() {
         let convexHullPoints = [];
         try {
             let options = {};
-            if(selectedAlgorithm === "Chan's Algorithm")
+            if(selectedAlgorithm === "Chan's Algorithm") {
                 options = {mValue: mValue};
-            if(selectedAlgorithm in ConvexHullAlgorithms)
                 convexHullPoints = await ConvexHullAlgorithms[selectedAlgorithm](ctx, canvas, points, options);
+                DrawPoints2D(ctx, points);
+                DrawHull(ctx, convexHullPoints, {lineWidth : 4});
+            }
+            else {
+                let numSteps = stepSliderRange[1];
+                let speed = numSteps < 200? numSteps < 50? 40:5 : 1;
+                for(let i = 0; i <= stepSliderRange[1]; i++) {
+                    await new Promise(resolve => setTimeout(resolve, speed));
+                    AnimationAlgorithm(ctx, canvas, i);
+                }
+            }
             
-            DrawPoints2D(ctx, points);
-            DrawHull(ctx, convexHullPoints, {lineWidth : 4});
             console.log("Algorithm Finished");
             console.log(convexHullPoints);
         }
@@ -77,7 +111,7 @@ function ConvexHullView() {
                 <Stack spacing={2} direction="row">
                     <InputSlider name = "Steps"
                                 inputSliderValue = {[stepSlider, setStepSliders]}
-                                range = {[min, max]}
+                                range = {stepSliderRange}
                                 // sideNameFlag = {true}
                                 disabled = {isProcessing}
                     />

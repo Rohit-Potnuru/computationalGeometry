@@ -7,7 +7,7 @@ import Slider from '@mui/material/Slider';
 import MuiInput from '@mui/material/Input';
 
 const Input = styled(MuiInput)`
-  width: 42px;
+  width: 'auto';
 `;
 
 export default function InputSlider({name, sideNameFlag = false, inputSliderValue, range, disabled = false}) {
@@ -71,8 +71,8 @@ export default function InputSlider({name, sideNameFlag = false, inputSliderValu
             onBlur={handleBlur}
             inputProps={{
               step: 1,
-              min: {min},
-              max: {max},
+              min: min,
+              max: max,
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}

@@ -1,7 +1,7 @@
-import { DrawPoints2D } from "../../shapes/point2D";
+import { DrawPoints2D } from "../draw/DrawPoints2D";
 import DrawHull from "../draw/DrawHull";
 import { cross } from "../../utils/Orientation";
-import { clearCanvas } from "../draw/canvas";
+import { clearCanvas } from "../draw/Canvas";
 import GrahamScanAlgorithm from "./GrahamScan";
 
 const X = 0;

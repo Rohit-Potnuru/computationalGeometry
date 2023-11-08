@@ -1,7 +1,7 @@
-import { DrawPoints2D } from "../../shapes/point2D";
+import { DrawPoints2D } from "../draw/DrawPoints2D";
 import { cross } from "../../utils/Orientation";
 import DrawHull from "../draw/DrawHull";
-import { clearCanvas } from "../draw/canvas";
+import { clearCanvas } from "../draw/Canvas";
 
 async function GrahamScanAlgorithm(ctx, canvas, points, options) {
 

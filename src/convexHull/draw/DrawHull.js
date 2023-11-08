@@ -4,7 +4,7 @@ function DrawHull(ctx, points, options = {}) {
     const {
         strokeStyle = 'red',
         closePath = false,
-        lineWidth = 2,
+        lineWidth = 3,
         dotted = false,
         lineDash = [5, 5] // Default pattern for dotted lines
     } = options;
