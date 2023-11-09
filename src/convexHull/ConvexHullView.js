@@ -1,13 +1,13 @@
 import './ConvexHullView.css';
 import React, { useRef, useEffect, useState} from 'react';
+import { Stack } from '@mui/system';
+import InputSlider from '../utils/components/InputSlider';
+import MultipleSelect from '../utils/components/InputSelect';
 import { generatePoints } from '../utils/points';
 import { DrawPoints2D } from './draw/DrawPoints2D';
 import { clearCanvas } from './draw/Canvas';
 import DrawHull from './draw/DrawHull';
-import InputSlider from '../utils/components/InputSlider';
-import MultipleSelect from '../utils/components/InputSelect';
 import ConvexHullAlgorithms from './algorithms/ConvexHullAlgorithms';
-import { Stack } from '@mui/system';
 
 
 function ConvexHullView() {
@@ -24,8 +24,8 @@ function ConvexHullView() {
 
     useEffect(() => {
         const sizes = {
-            width: 700,
-            height: 700
+            width: 850,
+            height: 850
         }
 
         const canvas = canvasRef.current;
@@ -112,13 +112,12 @@ function ConvexHullView() {
                     <InputSlider name = "Steps"
                                 inputSliderValue = {[stepSlider, setStepSliders]}
                                 range = {stepSliderRange}
-                                // sideNameFlag = {true}
-                                disabled = {isProcessing}
+                                props = {{disabled : isProcessing,}}
                     />
                     <InputSlider name = "Number of Points"
                                 inputSliderValue = {[numPoints, setNumPoints]}
                                 range = {[minNumPoints, maxNumPoints]}
-                                disabled = {isProcessing}
+                                props = {{disabled : isProcessing,}}
                     />
                 </Stack>
                 <MultipleSelect name = "Convex Hull Algorithm"
@@ -129,8 +128,8 @@ function ConvexHullView() {
                     <InputSlider name = "m Value"
                         inputSliderValue = {[mValue, setMValue]}
                         range = {[2, 2500]}
-                        sideNameFlag = {true}
-                        disabled = {isProcessing}
+                        props = {{sideNameFlag : true,
+                                  disabled : isProcessing,}}
                     />
                 }
                 

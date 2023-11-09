@@ -10,7 +10,12 @@ const Input = styled(MuiInput)`
   width: 'auto';
 `;
 
-export default function InputSlider({name, sideNameFlag = false, inputSliderValue, range, disabled = false}) {
+export default function InputSlider({name, inputSliderValue, range, props}) {
+  const {
+    sideNameFlag = false,
+    disabled = false,
+    step = 1
+  } = props;
   const [sliderValue, setSliderValue] = inputSliderValue;
   const [min, max] = range;
 
@@ -70,7 +75,7 @@ export default function InputSlider({name, sideNameFlag = false, inputSliderValu
             onChange={handleInputChange}
             onBlur={handleBlur}
             inputProps={{
-              step: 1,
+              step: step,
               min: min,
               max: max,
               type: 'number',

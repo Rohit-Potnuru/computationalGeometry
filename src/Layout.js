@@ -5,9 +5,9 @@ function Layout() {
     return (
         <div>
             <nav>
-            <ul>
-                <Link to="/computationalGeometry">Home</Link>
-            </ul>
+                <ul>
+                    <Link to="/computationalGeometry">Home</Link>
+                </ul>
             </nav>
             <Outlet />
         </div>
