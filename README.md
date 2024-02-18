@@ -1,6 +1,6 @@
 # computationalGeometry
 
-[Computational Geometry Algorithms Visuvalizations](https://rohit-potnuru.github.io/computationalGeometry/)
+[Computational Geometry Algorithms Visualizations](https://rohit-potnuru.github.io/computationalGeometry/)
 
 Convex Hull Algorithms
  * Graham Scan Algorithm
